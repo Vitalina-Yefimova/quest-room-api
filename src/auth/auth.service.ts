@@ -11,6 +11,7 @@ import { Otp, OtpDocument } from 'src/mongo-schemas/otp.schema';
 import { Model } from 'mongoose';
 import { OtpVerifyRequest } from './interfaces';
 import { EmailService } from 'src/email/email.service';
+import { JWT_SECRET } from 'src/utils/config';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +41,7 @@ export class AuthService {
       sub: user.id,
       type: 'verify',
     }, {
-      secret: process.env.JWT_SECRET,
+      secret: JWT_SECRET,
       expiresIn: '1h',
     })
 
@@ -84,7 +85,7 @@ export class AuthService {
 
   async verifyEmail(token: string) {
     try {
-      const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      const payload = this.jwtService.verify(token, { secret: JWT_SECRET });
       if (payload.type !== 'verify') throw new BadRequestException('Invalid token type');
 
       await this.usersService.updateUser({ verify: true, emailVerified: true }, token);
@@ -93,7 +94,7 @@ export class AuthService {
 
       const access_token = this.jwtService.sign(
         { sub: user.id, role: user.role },
-        { secret: process.env.JWT_SECRET }
+        { secret: JWT_SECRET }
       );
 
       return { access_token };
@@ -183,7 +184,7 @@ export class AuthService {
 
   async resetPassword(token: string, newPassword: string) {
     try {
-      const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      const payload = this.jwtService.verify(token, { secret: JWT_SECRET });
       if (payload.type !== 'reset-password') {
         throw new BadRequestException('Invalid token type');
       }

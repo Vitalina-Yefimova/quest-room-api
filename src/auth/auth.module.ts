@@ -11,6 +11,7 @@ import { EmailModule } from 'src/email/email.module';
 import { SmsModule } from 'src/sms/sms.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Otp, OtpSchema } from '../mongo-schemas/otp.schema';
+import { JWT_EXPIRES_IN, JWT_SECRET } from 'src/utils/config';
 
 @Module({
   imports: [
@@ -19,8 +20,8 @@ import { Otp, OtpSchema } from '../mongo-schemas/otp.schema';
     forwardRef(() => SmsModule),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
+      secret: JWT_SECRET,
+      signOptions: { expiresIn: JWT_EXPIRES_IN },
     }),
     ConfigModule.forRoot({
       isGlobal: true,

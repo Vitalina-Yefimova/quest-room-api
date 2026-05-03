@@ -6,6 +6,7 @@ import { EmailRequest, EmailResponse } from './interfaces';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import * as handlebars from 'handlebars';
+import { SENDGRID_API_KEY } from 'src/utils/config';
 
 @Injectable()
 export class EmailService {
@@ -13,7 +14,7 @@ export class EmailService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
   ) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    sgMail.setApiKey(SENDGRID_API_KEY || '');
   }
 
   async sendEmail(data: EmailRequest): Promise<EmailResponse> {

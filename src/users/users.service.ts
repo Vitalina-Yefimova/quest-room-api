@@ -3,6 +3,7 @@ import { UsersDataService } from './users-data.service';
 import { UsersRequest } from './interfaces';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { JWT_SECRET } from 'src/utils/config';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
 
     try {
       const payload = this.jwtService.verify(token, {
-        secret: process.env.JWT_SECRET,
+        secret: JWT_SECRET,
       });
       return payload.sub;
     } catch (error) {
@@ -66,7 +67,7 @@ export class UsersService {
     if (token) {
       try {
         const payload = this.jwtService.verify(token, {
-          secret: process.env.JWT_SECRET,
+          secret: JWT_SECRET,
         })
         type = payload.type
       } catch (error) {
