@@ -1,5 +1,5 @@
 {
-  "name": "quests-api",
+  "name": "quest-room-api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -13,7 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "seed": "ts-node src/quests/scripts/quests.seed.ts"
+    "seed": "ts-node src/seeds/quests/quests.seed.ts"
   },
   "dependencies": {
     "@nestjs/config": "^4.0.2",

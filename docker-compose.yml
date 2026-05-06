@@ -1,11 +1,9 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:latest
-    container_name: quests-api-postgres
+    container_name: quest-room-api-postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -13,5 +11,16 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  mongo:
+    image: mongo:7
+    container_name: quest-room-api-mongo
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: quest-room
+    volumes:
+      - mongodata:/data/db
+
 volumes:
   pgdata:
+  mongodata:
