@@ -2,7 +2,7 @@
 
 NestJS backend for the Quest Room app: auth (phone / email, JWT, cookies), quest catalog (MongoDB), user profile, orders, favorites, transactional email (SendGrid) and SMS / OTP (Twilio). User data and orders are stored in **PostgreSQL** via **Prisma**; quest content and related documents use **MongoDB** (Mongoose).
 
-**Source:** [github.com/Vitalina-Yefimova/quest-room-api](https://github.com/Vitalina-Yefimova/quest-room-api) · **Live API:** [quest-room-api-git-master-vitalina-yefimova.vercel.app](https://quest-room-api-git-master-vitalina-yefimova.vercel.app)
+**Source:** [github.com/Vitalina-Yefimova/quest-room-api](https://github.com/Vitalina-Yefimova/quest-room-api) · **Live API:** [quest-room-api.vercel.app](https://quest-room-api.vercel.app)
 
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -34,23 +34,23 @@ Copy [`.env.example`](.env.example) to **`.env`** and fill in real values. On Ve
 | Variable            | Notes |
 | ------------------- | ----- |
 | `PORT`              | HTTP port (e.g. `3000` locally). |
-| `FRONTEND_URL`      | **Exact** browser origin(s) for CORS with `credentials: true` — comma-separated, e.g. deployed Vite app **and** `http://localhost:5173` for local dev. Full URLs are OK; they are normalized to `origin` in code. |
+| `FRONTEND_URL`      | **Exact** browser origin(s) for CORS with `credentials: true` — comma-separated, e.g. deployed Next.js app **and** local frontend origin for dev. Full URLs are OK; they are normalized to `origin` in code. |
 | `DATABASE_URL`      | PostgreSQL connection string for Prisma. |
-| `MONGO_URI`         | MongoDB (local or Atlas). |
+| `MONGODB_URI`       | MongoDB (local or Atlas). |
 | `JWT_SECRET`        | Long random string for signing JWTs. |
 | `JWT_EXPIRES_IN`    | JWT lifetime (e.g. `7d`, `1d`). |
 | `SENDGRID_API_KEY`  | Optional; email features need a real key. |
 | `TWILIO_*`          | Optional; SMS / OTP need all three when used. |
 
-### CORS and the React frontend
+### CORS and the Next.js frontend
 
 The UI lives in a **separate repo** and a different origin in production. The API sets `Access-Control-Allow-Origin` from **`FRONTEND_URL`** and enables **`credentials: true`**, so the browser only accepts responses when the frontend origin is listed.
 
-**Frontend (SPA):** [**Vitalina-Yefimova/quest-room-react-frontend**](https://github.com/Vitalina-Yefimova/quest-room-react-frontend) — set **`VITE_API_BASE_URL`** to this API’s public URL for production. Live demo: [quest-room-react-frontend-vitalina-yefimova.vercel.app](https://quest-room-react-frontend-vitalina-yefimova.vercel.app/).
+**Frontend (Next.js):** [**Vitalina-Yefimova/quest-room-nextjs-frontend**](https://github.com/Vitalina-Yefimova/quest-room-nextjs-frontend) — set **`API_BASE_URL`** to this API’s public URL for production. Live demo: [quest-room-nextjs-frontend.vercel.app](https://quest-room-nextjs-frontend.vercel.app/).
 
 **Backend (this repo):** [**Vitalina-Yefimova/quest-room-api**](https://github.com/Vitalina-Yefimova/quest-room-api).
 
-**Local dev:** e.g. API `http://localhost:3000` and Vite `http://localhost:5173` — include **both** in `FRONTEND_URL` if you test cross-origin with cookies, or use only the origin you actually open in the browser.
+**Local dev:** e.g. API `http://localhost:3000` and Next.js `http://localhost:3000` (or your actual local frontend origin) — include the frontend origin(s) in `FRONTEND_URL` when testing cross-origin with cookies.
 
 ---
 
@@ -66,7 +66,7 @@ The UI lives in a **separate repo** and a different origin in production. The AP
 
    Default in [`.env.example`](.env.example) matches `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` in [`docker-compose.yml`](docker-compose.yml).
 
-2. **MongoDB** — run locally or point `MONGO_URI` to Atlas.
+2. **MongoDB** — run locally or point `MONGODB_URI` to Atlas.
 
 3. Install and env:
 
@@ -102,7 +102,7 @@ npm run seed              # seed MongoDB quests (see src/seeds/quests)
 
 ## Deploy (e.g. Vercel)
 
-Set the same environment variables as in production **`.env`**. The app expects **`DATABASE_URL`**, **`MONGO_URI`**, **`JWT_*`**, and **`FRONTEND_URL`** at minimum. Build command is typically **`npm run build`**; start command **`npm run start:prod`** (or the platform’s Nest/serverless adapter if you use one).
+Set the same environment variables as in production **`.env`**. The app expects **`DATABASE_URL`**, **`MONGODB_URI`**, **`JWT_*`**, and **`FRONTEND_URL`** at minimum. Build command is typically **`npm run build`**; start command **`npm run start:prod`** (or the platform’s Nest/serverless adapter if you use one).
 
 ---
 
