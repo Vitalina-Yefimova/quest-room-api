@@ -1,4 +1,4 @@
-import { BaseResponseDto } from 'src/common/dto/base-response.dto';
+import { BaseResponseDto } from '../../common/dto/base-response.dto';
 import { UsersResponse } from '../interfaces';
 
 export class UsersResponseDto extends BaseResponseDto<UsersResponseDto> implements UsersResponse {

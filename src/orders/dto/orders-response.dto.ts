@@ -1,5 +1,5 @@
 import { IsNumber, IsDate, IsString, IsOptional, IsEnum } from 'class-validator';
-import { BaseResponseDto } from 'src/common/dto/base-response.dto';
+import { BaseResponseDto } from '../../common/dto/base-response.dto';
 import { OrdersResponse, OrderStatus } from '../interfaces';
 
 export class OrdersResponseDto extends BaseResponseDto<OrdersResponseDto> implements OrdersResponse {

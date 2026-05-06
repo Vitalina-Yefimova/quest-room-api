@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { EmailRequest, EmailResponse } from './interfaces';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import * as handlebars from 'handlebars';
-import { SENDGRID_API_KEY } from 'src/utils/config';
+import { SENDGRID_API_KEY } from '../utils/config';
 
 @Injectable()
 export class EmailService {

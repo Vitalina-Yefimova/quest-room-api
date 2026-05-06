@@ -1,6 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 import { FavoritesResponse } from '../interfaces';
-import { BaseResponseDto } from 'src/common/dto/base-response.dto';
+import { BaseResponseDto } from '../../common/dto/base-response.dto';
 
 export class FavoritesResponseDto extends BaseResponseDto<FavoritesResponseDto> implements FavoritesResponse {
   @IsString()

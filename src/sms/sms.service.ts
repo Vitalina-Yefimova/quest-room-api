@@ -7,7 +7,7 @@ import {
   TWILIO_ACCOUNT_SID,
   TWILIO_AUTH_TOKEN,
   TWILIO_PHONE_NUMBER,
-} from 'src/utils/config';
+} from '../utils/config';
 
 @Injectable()
 export class SmsService {

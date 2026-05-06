@@ -1,5 +1,5 @@
 import { QuestsResponse, QuestsDocument } from '../interfaces';
-import { BaseResponseDto } from 'src/common/dto/base-response.dto';
+import { BaseResponseDto } from '../../common/dto/base-response.dto';
 
 export class QuestsResponseDto extends BaseResponseDto<QuestsResponse> implements QuestsResponse {
   id: string;

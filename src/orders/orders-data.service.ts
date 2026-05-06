@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Quests, QuestsDocument } from 'src/mongo-schemas/quests.schema';
+import { PrismaService } from '../prisma/prisma.service';
+import { Quests, QuestsDocument } from '../mongo-schemas/quests.schema';
 import { OrdersRequest, OrdersResponse, OrderStatus } from './interfaces';
 
 @Injectable()

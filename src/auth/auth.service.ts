@@ -3,15 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import { OtpSendRequest, SignInRequest, SignUpRequest } from './interfaces';
 import { SignInResponse } from './interfaces';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from 'src/users/users.service';
-import { SmsService } from 'src/sms/sms.service';
-import { SmsResponse } from 'src/sms/interfaces';
+import { UsersService } from '../users/users.service';
+import { SmsService } from '../sms/sms.service';
+import { SmsResponse } from '../sms/interfaces';
 import { InjectModel } from '@nestjs/mongoose';
-import { Otp, OtpDocument } from 'src/mongo-schemas/otp.schema';
+import { Otp, OtpDocument } from '../mongo-schemas/otp.schema';
 import { Model } from 'mongoose';
 import { OtpVerifyRequest } from './interfaces';
-import { EmailService } from 'src/email/email.service';
-import { JWT_SECRET } from 'src/utils/config';
+import { EmailService } from '../email/email.service';
+import { JWT_SECRET } from '../utils/config';
 
 @Injectable()
 export class AuthService {

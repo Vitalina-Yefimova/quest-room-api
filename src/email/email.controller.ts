@@ -2,7 +2,7 @@ import { EmailService } from "./email.service";
 import { Body, Controller, Post } from '@nestjs/common';
 import { EmailRequestDto } from "./dto/email-request.dto";
 import { EmailResponseDto } from "./dto/email-response.dto";
-import { Public } from "src/common/decorators/public.decorator";
+import { Public } from "../common/decorators/public.decorator";
 
 @Controller('email')
 export class EmailController {

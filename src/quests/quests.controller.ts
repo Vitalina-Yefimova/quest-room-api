@@ -2,7 +2,7 @@ import { Controller, Body, Post, Get, Param } from '@nestjs/common';
 import { QuestsService } from './quests.service';
 import { QuestsCreateManyDto } from './dto/quests-create-many.dto';
 import { QuestsResponseDto } from './dto/quests-response.dto';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('quests')
 export class QuestsController {

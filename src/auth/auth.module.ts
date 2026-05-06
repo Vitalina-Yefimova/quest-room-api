@@ -5,13 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { EmailModule } from 'src/email/email.module';
-import { SmsModule } from 'src/sms/sms.module';
+import { EmailModule } from '../email/email.module';
+import { SmsModule } from '../sms/sms.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Otp, OtpSchema } from '../mongo-schemas/otp.schema';
-import { JWT_EXPIRES_IN, JWT_SECRET } from 'src/utils/config';
+import { JWT_EXPIRES_IN, JWT_SECRET } from '../utils/config';
 
 @Module({
   imports: [
