@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -36,6 +36,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@nestjs/cli": "^11.0.14",
     "@eslint/js": "^9.27.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.9",
