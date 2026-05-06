@@ -5,7 +5,7 @@ import { z } from 'zod';
 const schema = z.object({
   PORT: z.coerce.number().int().positive(),
   DATABASE_URL: z.string().trim().min(1),
-  MONGO_URI: z.string().trim().min(1),
+  MONGODB_URI: z.string().trim().min(1),
   JWT_SECRET: z.string().trim().min(1),
   JWT_EXPIRES_IN: z.string().trim().min(1),
   FRONTEND_URL: z.string().trim().min(1),
@@ -20,7 +20,7 @@ export type ServerEnv = z.infer<typeof schema>;
 export const env: ServerEnv = schema.parse({
   PORT: process.env.PORT,
   DATABASE_URL: process.env.DATABASE_URL,
-  MONGO_URI: process.env.MONGO_URI,
+  MONGODB_URI: process.env.MONGODB_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
   FRONTEND_URL: process.env.FRONTEND_URL,
@@ -56,7 +56,7 @@ export function corsOrigins(): string | string[] {
 export const {
   PORT,
   DATABASE_URL,
-  MONGO_URI,
+  MONGODB_URI,
   JWT_SECRET,
   JWT_EXPIRES_IN,
   FRONTEND_URL,
