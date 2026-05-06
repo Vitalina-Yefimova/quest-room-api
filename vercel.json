@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "npm install",
+  "installCommand": "npm install && npx prisma generate",
   "buildCommand": "npm run build",
   "builds": [{ "src": "index.ts", "use": "@vercel/node" }],
   "routes": [{ "src": "/(.*)", "dest": "/index.ts" }]
