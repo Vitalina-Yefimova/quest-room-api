@@ -1,3 +1,5 @@
+import { Provider } from '@prisma/client';
+
 export interface SignInRequest {
   email: string;
   password: string;
@@ -28,4 +30,12 @@ export interface OtpSendRequest {
 export interface EmailChangeRequest {
   newEmail: string;
   frontendUrl: string;
+}
+
+export interface OAuthLoginRequest {
+  provider: Provider;
+  providerId: string;
+  email: string;
+  givenName?: string | null;
+  familyName?: string | null;
 }

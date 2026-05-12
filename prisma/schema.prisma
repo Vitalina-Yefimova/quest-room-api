@@ -15,11 +15,12 @@ model Users {
   newEmail   String? @unique
   emailVerified Boolean @default(false)
   password   String?
-  phone      String  @unique
+  phone      String? @unique
   role       Role    @default(USER)
   orders     Orders[]
   verify     Boolean @default(false)
   authMethod String?
+  accounts   OAuthAccount[]
 
   @@unique([email])
 }
@@ -46,4 +47,26 @@ enum OrderStatus {
   PENDING
   CONFIRMED
   CANCELLED
+}
+
+enum Provider {
+  google
+}
+
+
+model OAuthAccount {
+  id         Int    @id @default(autoincrement())
+  provider   Provider
+  providerId String
+
+  userId Int
+  user   Users @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("OAuthAccounts")
 }

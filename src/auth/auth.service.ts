@@ -1,17 +1,34 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { OtpSendRequest, SignInRequest, SignUpRequest } from './interfaces';
-import { SignInResponse } from './interfaces';
-import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
-import { SmsService } from '../sms/sms.service';
-import { SmsResponse } from '../sms/interfaces';
 import { InjectModel } from '@nestjs/mongoose';
-import { Otp, OtpDocument } from '../mongo-schemas/otp.schema';
+import { Provider } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { OtpVerifyRequest } from './interfaces';
 import { EmailService } from '../email/email.service';
-import { JWT_SECRET } from '../utils/config';
+import { Otp, OtpDocument } from '../mongo-schemas/otp.schema';
+import { SmsResponse } from '../sms/interfaces';
+import { SmsService } from '../sms/sms.service';
+import {
+  OAuthUsersRequest,
+  OAuthUsersResponse,
+  UsersRequest,
+  UsersResponse,
+} from '../users/interfaces';
+import { UsersService } from '../users/users.service';
+import { FRONTEND_URL, JWT_SECRET } from '../utils/config';
+import {
+  OAuthLoginRequest,
+  OtpSendRequest,
+  OtpVerifyRequest,
+  SignInRequest,
+  SignInResponse,
+  SignUpRequest,
+} from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -22,10 +39,9 @@ export class AuthService {
     private emailService: EmailService,
     @InjectModel(Otp.name)
     private readonly otpModel: Model<OtpDocument>,
-  ) { }
+  ) {}
 
   async signUp(data: SignUpRequest): Promise<{ email: string }> {
-
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = await this.usersService.createUser({
@@ -34,16 +50,19 @@ export class AuthService {
       email: data.email,
       phone: data.phone,
       password: hashedPassword,
-      authMethod: 'email'
+      authMethod: 'email',
     });
 
-    const token = this.jwtService.sign({
-      sub: user.id,
-      type: 'verify',
-    }, {
-      secret: JWT_SECRET,
-      expiresIn: '1h',
-    })
+    const token = this.jwtService.sign(
+      {
+        sub: user.id,
+        type: 'verify',
+      },
+      {
+        secret: JWT_SECRET,
+        expiresIn: '1h',
+      },
+    );
 
     await this.emailService.sendEmail({
       email: user.email,
@@ -54,47 +73,53 @@ export class AuthService {
         type: 'verify',
         token,
       },
-    })
+    });
 
-    return { email: user.email }
+    return { email: user.email };
   }
-  async validatePassword(email: string, password: string): Promise<{ id: number, role: string }> {
-    const user = await this.usersService.getUser({ email })
+  async validatePassword(
+    email: string,
+    password: string,
+  ): Promise<{ id: number; role: string }> {
+    const user = await this.usersService.getUser({ email });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException('Invalid credentials');
     }
     if (!user.verify) {
-      throw new UnauthorizedException('Email not verified')
+      throw new UnauthorizedException('Email not verified');
     }
-    return user
+    return user;
   }
 
   async signIn(user: SignInRequest): Promise<SignInResponse> {
-
-    const userData = await this.validatePassword(user.email, user.password)
+    const userData = await this.validatePassword(user.email, user.password);
 
     const token = this.jwtService.sign({
       sub: userData.id,
       role: userData.role,
-    })
+    });
     return {
-      access_token: token
-    }
+      access_token: token,
+    };
   }
 
   async verifyEmail(token: string) {
     try {
       const payload = this.jwtService.verify(token, { secret: JWT_SECRET });
-      if (payload.type !== 'verify') throw new BadRequestException('Invalid token type');
+      if (payload.type !== 'verify')
+        throw new BadRequestException('Invalid token type');
 
-      await this.usersService.updateUser({ verify: true, emailVerified: true }, token);
+      await this.usersService.updateUser(
+        { verify: true, emailVerified: true },
+        token,
+      );
 
       const user = await this.usersService.getUser({ token });
 
       const access_token = this.jwtService.sign(
         { sub: user.id, role: user.role },
-        { secret: JWT_SECRET }
+        { secret: JWT_SECRET },
       );
 
       return { access_token };
@@ -102,7 +127,6 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired token');
     }
   }
-
 
   async sendOtp(data: OtpSendRequest): Promise<SmsResponse> {
     const { phone } = data;
@@ -118,7 +142,7 @@ export class AuthService {
     });
 
     const message = `Your verification code is: ${code}`;
-    await this.smsService.sendSms(phone, message)
+    await this.smsService.sendSms(phone, message);
 
     return { phone };
   }
@@ -133,15 +157,15 @@ export class AuthService {
     if (
       !receivedCode ||
       receivedCode.code !== (code as number) ||
-      receivedCode.expiresAt < new Date()
-      || receivedCode.attempts >= 3
+      receivedCode.expiresAt < new Date() ||
+      receivedCode.attempts >= 3
     ) {
       throw new BadRequestException('Invalid OTP');
     }
 
     await this.otpModel.deleteOne({ id: receivedCode.id });
 
-    let user = await this.usersService.getUser({ phone })
+    let user = await this.usersService.getUser({ phone });
 
     if (!user) {
       user = await this.usersService.createUser({
@@ -154,22 +178,22 @@ export class AuthService {
     const access_token = this.jwtService.sign({
       sub: user.id,
       role: user.role,
-    })
+    });
 
-    return { access_token }
+    return { access_token };
   }
 
   async sendResetPasswordEmail(email: string, frontendUrl: string) {
-    const user = await this.usersService.getUser({ email })
+    const user = await this.usersService.getUser({ email });
 
     if (!user) {
-      throw new BadRequestException('User not found')
+      throw new BadRequestException('User not found');
     }
 
     const token = this.jwtService.sign({
       sub: user.id,
       type: 'reset-password',
-    })
+    });
 
     await this.emailService.sendEmail({
       email: user.email,
@@ -179,7 +203,7 @@ export class AuthService {
         frontendUrl,
         token,
       },
-    })
+    });
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -189,20 +213,22 @@ export class AuthService {
         throw new BadRequestException('Invalid token type');
       }
 
-      return await this.usersService.updateUser({
-        password: newPassword,
-      }, token);
+      return await this.usersService.updateUser(
+        {
+          password: newPassword,
+        },
+        token,
+      );
     } catch {
       throw new BadRequestException('Invalid or expired token');
     }
   }
 
   async changeEmail(token: string, newEmail: string, frontendUrl: string) {
-
     const payload = this.jwtService.verify(token);
     const userId = payload.sub;
 
-    await this.usersService.updateUser({ newEmail }, token)
+    await this.usersService.updateUser({ newEmail }, token);
 
     const verifyToken = this.jwtService.sign({
       type: 'verify-email',
@@ -227,20 +253,106 @@ export class AuthService {
       const payload = this.jwtService.verify(token);
 
       if (payload.type !== 'verify-email') {
-        throw new BadRequestException('Invalid token type')
+        throw new BadRequestException('Invalid token type');
       }
 
-      const user = await this.usersService.getUser({ token })
+      const user = await this.usersService.getUser({ token });
       if (!user || !user.newEmail) {
-        throw new BadRequestException('No new email to verify')
+        throw new BadRequestException('No new email to verify');
       }
 
-      return this.usersService.updateUser({
-        email: user.newEmail,
-        emailVerified: true,
-      }, token)
+      return this.usersService.updateUser(
+        {
+          email: user.newEmail,
+          emailVerified: true,
+        },
+        token,
+      );
     } catch {
-      throw new BadRequestException('Invalid or expired token')
+      throw new BadRequestException('Invalid or expired token');
+    }
+  }
+
+  async oauthLogin(user: OAuthLoginRequest): Promise<SignInResponse> {
+    if (user.provider !== Provider.google) {
+      throw new BadRequestException('INVALID_PROVIDER');
+    }
+
+    let existingUser: UsersResponse | OAuthUsersResponse | null =
+      await this.usersService.getUser({
+        provider: user.provider,
+        providerId: user.providerId,
+      });
+
+    if (!existingUser) {
+      const userByEmail = await this.usersService.getUser({
+        email: user.email,
+      });
+      if (userByEmail) {
+        throw new ConflictException('USER_ALREADY_EXISTS');
+      }
+
+      const createData: UsersRequest = {
+        firstName: user.givenName ?? undefined,
+        lastName: user.familyName ?? undefined,
+        email: user.email,
+        password: null,
+        phone: null,
+        verify: true,
+        emailVerified: true,
+        authMethod: user.provider,
+      };
+
+      const oauthProvider: OAuthUsersRequest = {
+        provider: user.provider,
+        providerId: user.providerId,
+      };
+
+      existingUser = await this.usersService.createUser(
+        createData,
+        oauthProvider,
+      );
+    }
+
+    if (!existingUser) {
+      throw new BadRequestException('USER_CREATION_FAILED');
+    }
+
+    const token = this.jwtService.sign({
+      sub: existingUser.id,
+      role: existingUser.role,
+    });
+
+    return {
+      access_token: token,
+    };
+  }
+
+  async handleOAuthCallback(
+    queryError: string | undefined,
+    user: OAuthLoginRequest | undefined,
+    emailRequiredError: string,
+  ): Promise<string> {
+    if (queryError === 'access_denied') {
+      return `${FRONTEND_URL}/login?error=${encodeURIComponent('OAUTH_ACCESS_DENIED')}`;
+    }
+
+    if (!user) {
+      return `${FRONTEND_URL}/login?error=${encodeURIComponent(emailRequiredError)}`;
+    }
+
+    try {
+      const result = await this.oauthLogin(user);
+      return `${FRONTEND_URL}?oauth_token=${result.access_token}`;
+    } catch (error) {
+      const errorMessage =
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+          ? error.message
+          : error instanceof Error && error.message === emailRequiredError
+            ? emailRequiredError
+            : 'OAUTH_FAILED';
+      return `${FRONTEND_URL}/login?error=${encodeURIComponent(errorMessage)}`;
     }
   }
 }
